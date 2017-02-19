@@ -61,10 +61,14 @@ def prepareJob(tag, i, folderName) :
     f.write('else    \n')
     f.write('   export LHAPDF_BASE=`scram tool info lhapdf | grep LHAPDF_BASE | sed -e s%LHAPDF_BASE=%%`    \n')
     f.write('fi    \n')
+# Needed for LHAPDF VERSION 5.9 (Andre Stahl, 2017-02-16)
+    f.write('export LHAPDF_BASE=/cvmfs/cms.cern.ch/slc6_amd64_gcc481/external/lhapdf/5.9.1-cms4    \n')
 
     f.write('echo "LHAPDF_BASE is set to:" $LHAPDF_BASE \n')
     f.write('export PATH=$LHAPDF_BASE/bin/:$PATH \n')
 #    f.write('export LHAPATH=`scram tool info lhapdf | grep LHAPATH | sed -e s%LHAPATH=%%`\n')
+# Needed for LHAPDF VERSION 5.9 (Andre Stahl, 2017-02-16)
+    f.write('export LHAPATH=/cvmfs/cms.cern.ch/slc6_amd64_gcc481/external/lhapdf/5.9.1-cms4/share/lhapdf/PDFsets \n')
     f.write('export LHAPDF_DATA_PATH=`$LHAPDF_BASE/bin/lhapdf-config --datadir` \n')
 #    f.write('export LHAPDF6TOOLFILE=$CMSSW_BASE/config/toolbox/$SCRAM_ARCH/tools/available/lhapdf6.xml \n\n')
 #    f.write('cd ' + rootfolder + '/' + folderName + '\n')
@@ -345,6 +349,8 @@ fi
 
 ### retrieve the powheg source tar ball
 export POWHEGSRC=powhegboxV2_Sep2016.tar.gz 
+# Include nPDF hack for LHAPDF v.5.9 (Andre Stahl, 2017-02-16)
+export POWHEGSRC=powhegboxV2_Aug2016_nPDF.tar.gz
 
 if [ "$process" = "b_bbar_4l" ]; then 
   export POWHEGSRC=powhegboxRES_Aug2016.tar.gz
@@ -353,7 +359,9 @@ fi
 echo 'D/L POWHEG source...'
 
 if [ ! -f ${POWHEGSRC} ]; then
-  wget --no-check-certificate http://cms-project-generators.web.cern.ch/cms-project-generators/slc6_amd64_gcc481/powheg/V2.0/src/${POWHEGSRC} || fail_exit "Failed to get powheg tar ball "
+  # Include web path to custom powhegbox tarball (Andre Stahl, 2017-02-16)
+  #wget --no-check-certificate http://cms-project-generators.web.cern.ch/cms-project-generators/slc6_amd64_gcc481/powheg/V2.0/src/${POWHEGSRC} || fail_exit "Failed to get powheg tar ball "
+  wget --no-check-certificate https://dl.dropbox.com/s/amwbb85taqorrko/${POWHEGSRC} || fail_exit "Failed to get powheg tar ball "
 fi
 
 tar zxf ${POWHEGSRC}
