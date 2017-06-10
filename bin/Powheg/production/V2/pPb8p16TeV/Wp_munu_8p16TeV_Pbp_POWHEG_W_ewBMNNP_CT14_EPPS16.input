@@ -1,6 +1,6 @@
 !Single vector boson production parameters
-idvecbos    24    ! PDG code for vector boson to be produced ( W+:24 W-:-24 )
-vdecaymode -13    !(11(-11):electronic decay, 13(-13): muonic decay, 15(-15): tauonic decay) 
+idvecbos   -24    ! PDG code for vector boson to be produced ( W+:24 W-:-24 )
+vdecaymode  13    !(11(-11):electronic decay, 13(-13): muonic decay, 15(-15): tauonic decay) 
 
 !Heavy flavour production parameters
 numevts NEVENTS    ! number of events to be generated
@@ -12,8 +12,8 @@ ebeam1   4080d0    ! energy of beam 1
 ebeam2   4080d0    ! energy of beam 2
 
 !nuclear PDF parameters
-ia1          1     ! (default 1) ion 1 (208 for Pb)
-ia2        208     ! (default 1) ion 2 (208 for Pb)
+ia1        208     ! (default 1) ion 1 (208 for Pb)
+ia2          1     ! (default 1) ion 2 (208 for Pb)
 nPDFerrSet   1     ! (default 1) EPPS16 sets (1: central set, 2-41: error variation sets)
 
 ! To be set for QED Corrections
