@@ -82,6 +82,10 @@ if [[ -d ${WORKDIR}/obj-gfortran ]]; then
     ln -s ${WORKDIR}/obj-gfortran .
     cp -p ${WORKDIR}/pwg*.dat .
 fi
+### For EPPS16 nPDF process
+if [ -e  ${WORKDIR}/EPPS16NLOR_208 ]; then
+    cp -p ${WORKDIR}/EPPS16NLOR_208 .
+fi
 
 if [[ ! -e ${card} ]]; then
  fail_exit "powheg.input not found!"
@@ -330,6 +334,28 @@ then
         mv powheg.input powheg.input.${iteration}
         iteration=$(( iteration + 1 ))
     done
+
+    if grep -q "nPDFerrSet " powheg.input.tmp; then
+        echo -e "\ncomputing weights for 40+1 EPPS16 nPDF variations\n"
+        iteration=1
+        lastfile=41
+        counter=6000
+        while [ $iteration -le $lastfile ];
+        do
+	    echo -e "\n PDF set ${iteration}"
+            sed -e 's/.*nPDFerrSet.*/nPDFerrSet '$iteration'/' powheg.input.tmp > powheg.input
+	    counter=$(( counter + 1 ))
+	    echo -e "\nlhrwgt_id '${counter}'" >> powheg.input
+	    echo -e "lhrwgt_descr 'PDF set = ${iteration}'" >> powheg.input
+	    echo -e "lhrwgt_group_name 'PDF_variation'" >> powheg.input
+	    echo -e "lhrwgt_group_combine 'hessian'" >> powheg.input
+
+            ../pwhg_main &>> reweightlog_${process}_${seed}.txt; test $? -eq 0 || fail_exit "pwhg_main error: exit code not 0"
+	    mv pwgevents-rwgt.lhe pwgevents.lhe
+	    mv powheg.input powheg.input.${iteration}
+	    iteration=$(( iteration + 1 ))
+        done
+    fi
 
 
     rm -rf powheg.input*
