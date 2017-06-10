@@ -383,6 +383,7 @@ fi
 echo ${POWHEGSRC} > VERSION
 
 patch -l -p0 -i ${WORKDIR}/patches/lhapdfif_nPDF.patch
+patch -l -p0 -i ${WORKDIR}/patches/pdfcalls_nPDF.patch
 wget http://users.jyu.fi/~kaeskola/EPPS16/EPPS16NLOR_208
 cd POWHEG-BOX/${process}
 wget http://users.jyu.fi/~kaeskola/EPPS16/EPPS16.f
