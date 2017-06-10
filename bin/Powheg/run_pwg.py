@@ -75,6 +75,7 @@ def prepareJob(tag, i, folderName) :
     f.write ('cp -p ' + rootfolder + '/' + folderName + '/JHUGen.input ./' + '\n')
     f.write ('cp -p ' + rootfolder + '/' + folderName + '/*.dat  ./' + '\n') 
     f.write ('cp -p ' + rootfolder + '/' + folderName + '/pwhg_main  ./' + '\n')
+    f.write ('cp -p ' + rootfolder + '/' + folderName + '/EPPS16NLOR_208  ./' + '\n')
     f.write ('if [ -e '+ rootfolder + '/' + folderName + '/obj-gfortran/proclib ]; then    \n')
     f.write ('  mkdir ./obj-gfortran/' + '\n')
     f.write ('  cp -pr ' + rootfolder + '/' + folderName + '/obj-gfortran/proclib  ./obj-gfortran/' + '\n')
@@ -99,6 +100,7 @@ def prepareJobForEvents (tag, i, folderName, EOSfolder) :
     f.write ('cp -p ' + rootfolder + '/' + folderName + '/powheg.input ./' + '\n')
     f.write ('cp -p ' + rootfolder + '/' + folderName + '/JHUGen.input ./' + '\n')
     f.write ('cp -p ' + rootfolder + '/' + folderName + '/*.dat  ./' + '\n')
+    f.write ('cp -p ' + rootfolder + '/' + folderName + '/EPPS16NLOR_208  ./' + '\n')
     f.write ('if [ -e '+ rootfolder + '/' + folderName + '/obj-gfortran/proclib ]; then    \n')
     f.write ('  mkdir ./obj-gfortran/' + '\n')
     f.write ('  cp -pr ' + rootfolder + '/' + folderName + '/obj-gfortran/proclib  ./obj-gfortran/' + '\n')
@@ -110,6 +112,7 @@ def prepareJobForEvents (tag, i, folderName, EOSfolder) :
     f.write ('ls' + '\n')
     f.write ('echo ' + str (i) + ' | ' + rootfolder + '/pwhg_main &> log_' + tag + '.log ' + '\n')
     f.write ('cp -p log_' + tag + '.log ' + rootfolder + '/' + folderName + '/. \n')
+    f.write ('rm EPPS16NLOR_208' + '\n')
     #lhefilename = 'pwgevents-{:04d}.lhe'.format(i) 
 
     #f.write ('cmsStage ' + lhefilename + ' /store/user/govoni/LHE/powheg/' + EOSfolder + '/\n')
@@ -169,6 +172,7 @@ def runParallelXgrid(parstage, xgrid, folderName, nEvents, njobs, powInputName, 
         f.write('cp -p *.log ' + rootfolder + '/' + folderName + '/. \n')  
         f.write('cp -p *.top ' + rootfolder + '/' + folderName + '/. \n')  
         f.write('cp -p *.dat ' + rootfolder + '/' + folderName + '/. \n')  
+        f.write ('rm EPPS16NLOR_208' + '\n')
 
         f.close()
 
@@ -378,7 +382,10 @@ fi
 
 echo ${POWHEGSRC} > VERSION
 
+patch -l -p0 -i ${WORKDIR}/patches/lhapdfif_nPDF.patch
+wget http://users.jyu.fi/~kaeskola/EPPS16/EPPS16NLOR_208
 cd POWHEG-BOX/${process}
+wget http://users.jyu.fi/~kaeskola/EPPS16/EPPS16.f
 
 # This is just to please gcc 4.8.1
 mkdir -p include
@@ -457,7 +464,7 @@ echo "ANALYSIS=none " >> tmpfile
 if [ "$process" = "Wgamma" ]; then
   echo "PWHGANAL=$BOOK_HISTO pwhg_analysis-dummy.o uti.o " >> tmpfile
 else
-  echo "PWHGANAL=$BOOK_HISTO pwhg_analysis-dummy.o " >> tmpfile
+  echo "PWHGANAL=$BOOK_HISTO pwhg_analysis-dummy.o EPPS16.o" >> tmpfile
 fi
 echo "LHAPDF_CONFIG=${LHAPDF_BASE}/bin/lhapdf-config" >> tmpfile
 mv Makefile Makefile.interm

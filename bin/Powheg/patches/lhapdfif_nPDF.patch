@@ -1,0 +1,99 @@
+--- ../PowHeg/POWHEG-BOX/lhapdfif.f	2016-09-23 15:15:29.000000001 +0200
++++ POWHEG-BOX/lhapdfif.f	2017-06-10 04:55:28.000000001 +0200
+@@ -145,13 +145,16 @@
+       real * 8 xmu2,x,fx(-pdf_nparton:pdf_nparton)
+       real * 8 fxlha(-6:6)
+       integer j
+-      real * 8 tmp
++      real * 8 tmp,A,Z
+       real*8 photon
+       call genericpdfset(ndns)
+ 
+ c photon induced work only with MRST2004QED (ndns = 20460)
+       if (ndns.eq.20460) then
+           call evolvePDFphoton(x,sqrt(xmu2),fxlha,photon)
++      elseif (ih.eq.208) then
++          call evolvePDFhi(x,sqrt(xmu2),208d0,fxlha)
++          photon=0d0
+       else
+           call evolvePDF(x,sqrt(xmu2),fxlha)
+           photon=0d0
+@@ -185,6 +188,16 @@
+         fx(-1) = 0.5 * ( fx(-1)+fx(-2) )
+         fx(2)  = fx(1)
+         fx(-2) = fx(-1)         
++      elseif(ih.eq.208) then
++c 208 is Lead ion (Suggested by Andre Stahl, 18/5/2017)
++        A=208.d0
++        Z=82.d0
++        tmp=fx(-2)
++        fx(-2)=fx(-2)*Z/A + fx(-1)*(A-Z)/A
++        fx(-1)=fx(-1)*Z/A + tmp*(A-Z)/A
++        tmp=fx(1)
++        fx(1)=fx(1)*Z/A + fx(2)*(A-Z)/A
++        fx(2)=fx(2)*Z/A + tmp*(A-Z)/A         
+       elseif(ih.eq.4) then
+ c photon pdf
+          continue
+@@ -222,3 +235,61 @@
+       character * 3 whichpdfpk
+       whichpdfpk='lha'
+       end
++
++c evolve routine for EPPS16 nPDF
++      subroutine evolvePDFhi(x,Q,a,f) 
++      implicit none 
++      integer nset 
++      real*8 x,Q,f(-6:6),a
++      nset = 1 
++      call evolvePDFhiM(nset,x,Q,a,f) 
++      return
++      END
++    
++      subroutine evolvePDFhiM(nset,xin,Qin,a,f) 
++      implicit none 
++      real*8 x,Q,a,f(-6:6) 
++      real*8 ruv,rdv,ru,rd,rs,rc,rb,rt,rg 
++      integer nset,iimem,j 
++      real*8 xin,qin,q2in,tmp 
++      character*20 lparm 
++      real*8 xmin,xmax,q2min,q2max 
++      integer iorder,ipset,ia
++      real * 8 powheginput
++
++      call getlhaparm(18,lparm) 
++      if(lparm.ne.'EXTRAPOLATE') then 
++        call getnmem(nset,iimem) 
++        call getminmaxm(nset,iimem,xmin,xmax,q2min,q2max) 
++        x = max(xmin,min(xmax,xin)) 
++        q2in = qin**2 
++        q = sqrt(max(0d0,q2min,min(q2max,q2in))) 
++      else 
++        x = xin 
++        q = qin 
++      endif
++
++      iorder=2 
++      ipset=powheginput('#nPDFerrSet')
++      if(ipset.lt.1) ipset=1
++      ia = a
++      call epps16(iorder,ipset,ia,x,q,ruv,rdv,ru,rd,rs,rc,rb,rg)
++      rt = 1.0d0
++
++      call evolvePDFM(nset,x,Q,f)
++      f(0) = f(0)*rg
++      f(1) = f(1)*rdv-f(-1)*(rdv-rd)
++      f(2) = f(2)*ruv-f(-2)*(ruv-ru)
++      f(3) = f(3)*rs      
++      f(4) = f(4)*rc      
++      f(5) = f(5)*rb      
++      f(6) = f(6)*rt      
++      f(-6) = f(-6)*rt
++      f(-5) = f(-5)*rb
++      f(-4) = f(-4)*rc
++      f(-3) = f(-3)*rs
++      f(-2) = f(-2)*ru
++      f(-1) = f(-1)*rd
++
++      return
++      end
