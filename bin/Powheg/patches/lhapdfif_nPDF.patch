@@ -1,5 +1,5 @@
 --- ../PowHeg/POWHEG-BOX/lhapdfif.f	2016-09-23 15:15:29.000000001 +0200
-+++ POWHEG-BOX/lhapdfif.f	2017-06-10 04:55:28.000000001 +0200
++++ POWHEG-BOX/lhapdfif.f	2017-06-10 16:26:53.000000001 +0200
 @@ -145,13 +145,16 @@
        real * 8 xmu2,x,fx(-pdf_nparton:pdf_nparton)
        real * 8 fxlha(-6:6)
@@ -35,7 +35,7 @@
        elseif(ih.eq.4) then
  c photon pdf
           continue
-@@ -222,3 +235,61 @@
+@@ -222,3 +235,58 @@
        character * 3 whichpdfpk
        whichpdfpk='lha'
        end
@@ -61,17 +61,14 @@
 +      integer iorder,ipset,ia
 +      real * 8 powheginput
 +
-+      call getlhaparm(18,lparm) 
-+      if(lparm.ne.'EXTRAPOLATE') then 
-+        call getnmem(nset,iimem) 
-+        call getminmaxm(nset,iimem,xmin,xmax,q2min,q2max) 
-+        x = max(xmin,min(xmax,xin)) 
-+        q2in = qin**2 
-+        q = sqrt(max(0d0,q2min,min(q2max,q2in))) 
-+      else 
-+        x = xin 
-+        q = qin 
-+      endif
++c check range of x and Q. Freeze in boundaries of EPPS16
++      q2in = qin**2 
++      if(x.lt.0.0000001) write(*,*) "Warning: x<1E-7"
++      if(x.gt.1.d0) write(*,*) "Warning: x>1"
++      if(q2in.lt.1.69d0) write(*,*) "Warning: Q<1.3GeV"
++      if(q2in.gt.100000000.d0) write(*,*) "Warning: Q>10000GeV"
++      x = max(0.0000001,min(1.d0,xin)) 
++      q = sqrt(max(0d0,1.69d0,min(100000000.d0,q2in))) 
 +
 +      iorder=2 
 +      ipset=powheginput('#nPDFerrSet')
