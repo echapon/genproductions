@@ -1,5 +1,5 @@
 --- ../PowHeg/POWHEG-BOX/lhapdfif.f	2016-09-23 15:15:29.000000001 +0200
-+++ POWHEG-BOX/lhapdfif.f	2017-06-10 21:31:17.000000001 +0200
++++ POWHEG-BOX/lhapdfif.f	2017-06-17 21:37:56.000000001 +0200
 @@ -139,19 +139,32 @@
        subroutine genericpdf(ndns,ih,xmu2,x,fx)
  c Interface to lhapdf package.
@@ -93,7 +93,7 @@
 +
 +      iorder=2 
 +      ipset=powheginput('#nPDFerrSet')
-+      if(ipset.lt.1) ipset=1
++      if(ipset.lt.1) return
 +      call epps16(iorder,ipset,ia,x,q,ruv,rdv,ru,rd,rs,rc,rb,rg)
 +      rt = 1.0d0
 +
