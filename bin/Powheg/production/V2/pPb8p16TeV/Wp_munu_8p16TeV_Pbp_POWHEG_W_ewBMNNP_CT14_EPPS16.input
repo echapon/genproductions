@@ -1,6 +1,6 @@
 !Single vector boson production parameters
-idvecbos   -24    ! PDG code for vector boson to be produced ( W+:24 W-:-24 )
-vdecaymode  13    !(11(-11):electronic decay, 13(-13): muonic decay, 15(-15): tauonic decay) 
+idvecbos    24    ! PDG code for vector boson to be produced ( W+:24 W-:-24 )
+vdecaymode -13    !(11(-11):electronic decay, 13(-13): muonic decay, 15(-15): tauonic decay) 
 
 !Heavy flavour production parameters
 numevts NEVENTS    ! number of events to be generated
